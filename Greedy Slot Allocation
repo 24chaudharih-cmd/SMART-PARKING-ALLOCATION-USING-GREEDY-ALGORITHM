@@ -1,0 +1,21 @@
+allocation = []
+total_distance = 0
+
+
+for i in range(len(vehicles)):
+    if i < len(slots):
+        vehicle = vehicles[i]
+        slot = slots[i]
+        allocation.append({'vehicle': vehicle, 'slot': slot['id'], 'distance': slot['distance'], 'location': slot['location']})
+        total_distance += slot['distance']
+        slot_df.loc[slot_df['id'] == slot['id'], 'vehicle'] = vehicle
+
+
+print("\nParking Allocation Results (Greedy Method - Shegaon Lot):")
+for a in allocation:
+    print(f"{a['vehicle']} -> {a['slot']} ({a['location']}) (Distance: {a['distance']} m)")
+
+
+avg_distance = total_distance / len(allocation)
+print("\nTotal Travel Distance:", total_distance, "meters")
+print("Average Distance per Vehicle:", round(avg_distance, 2), "meters")
