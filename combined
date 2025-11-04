@@ -1,0 +1,141 @@
+# SMART PARKING ALLOCATION USING GREEDY ALGORITHM
+
+import time
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Member 1: Parking Slot Initialization & Setup
+vehicles = ['V1', 'V2', 'V3', 'V4']
+
+slots = [
+    {'id': 'S1', 'distance': 10},
+    {'id': 'S2', 'distance': 15},
+    {'id': 'S3', 'distance': 5},
+    {'id': 'S4', 'distance': 12}
+]
+
+# Sort slots by nearest distance (Greedy preparation)
+slots.sort(key=lambda x: x['distance'])
+
+print("Available Parking Slots (Sorted by Distance):")
+for s in slots:
+    print(f"{s['id']} - {s['distance']} meters")
+
+# Convert to DataFrame for visualization
+slot_df = pd.DataFrame(slots)
+slot_df['vehicle'] = None
+
+
+# Member 2: Greedy Slot Allocation
+
+allocation = []
+total_distance = 0
+
+for i in range(len(vehicles)):
+    if i < len(slots):
+        vehicle = vehicles[i]
+        slot = slots[i]
+        allocation.append({'vehicle': vehicle, 'slot': slot['id'], 'distance': slot['distance']})
+        total_distance += slot['distance']
+        slot_df.loc[slot_df['id'] == slot['id'], 'vehicle'] = vehicle
+
+print("\nParking Allocation Results (Greedy Method):")
+for a in allocation:
+    print(f"{a['vehicle']} -> {a['slot']} (Distance: {a['distance']}m)")
+
+avg_distance = total_distance / len(allocation)
+print("\nTotal Travel Distance:", total_distance, "meters")
+print("Average Distance per Vehicle:", round(avg_distance, 2), "meters")
+
+
+# Member 3: Efficiency Comparison (Greedy vs Brute Force)
+
+# Greedy Method
+start_greedy = time.time()
+greedy_distance = sum(slot['distance'] for slot in slots[:len(vehicles)])
+end_greedy = time.time()
+
+# Brute Force Method (Non-Greedy)
+start_brute = time.time()
+min_distance = float('inf')
+best_order = []
+
+for i in range(len(slots)):
+    for j in range(len(slots)):
+        for k in range(len(slots)):
+            for l in range(len(slots)):
+                if len({i, j, k, l}) == len(vehicles):  # unique slots only
+                    total = slots[i]['distance'] + slots[j]['distance'] + slots[k]['distance'] + slots[l]['distance']
+                    if total < min_distance:
+                        min_distance = total
+                        best_order = [slots[i]['id'], slots[j]['id'], slots[k]['id'], slots[l]['id']]
+
+end_brute = time.time()
+
+# Results
+
+print("\nEfficiency Comparison:")
+print(f"Greedy Total Distance: {greedy_distance} m (Time: {round(end_greedy - start_greedy, 5)} sec)")
+print(f"Brute Force Optimal Distance: {min_distance} m (Time: {round(end_brute - start_brute, 5)} sec)")
+
+if greedy_distance == min_distance:
+    print("\nGreedy Algorithm found the Optimal Solution.")
+else:
+    print("\nGreedy Algorithm gave a near-optimal solution, but executed much faster.")
+
+# Visualization 
+
+sns.set_theme(style="whitegrid")
+
+plt.figure(figsize=(10, 4))
+
+# Bar Plot for Distance Comparison
+plt.subplot(1, 2, 1)
+sns.barplot(x=['Greedy', 'Brute Force'], y=[greedy_distance, min_distance], palette='Blues')
+plt.title('Total Travel Distance (m)')
+plt.ylabel('Distance')
+
+# Bar Plot for Execution Time Comparison
+plt.subplot(1, 2, 2)
+sns.barplot(x=['Greedy', 'Brute Force'], y=[round(end_greedy - start_greedy, 5), round(end_brute - start_brute, 5)], palette='Oranges')
+plt.title('Execution Time (sec)')
+plt.ylabel('Time (sec)')
+
+plt.tight_layout()
+plt.show()
+
+# Parking Layout Visualization
+plt.figure(figsize=(8, 4))
+sns.scatterplot(x='distance', y='id', data=slot_df, s=200, color='skyblue', edgecolor='black')
+for i in range(len(slot_df)):
+    if pd.notna(slot_df['vehicle'][i]):
+        plt.text(slot_df['distance'][i] + 0.4, slot_df['id'][i], slot_df['vehicle'][i], fontsize=10, color='darkblue')
+plt.title('Smart Parking Slot Allocation (Greedy Method)')
+plt.xlabel('Distance from Entry (m)')
+plt.ylabel('Slot ID')
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+# Time Complexity Analysis
+
+print("\nTime Complexity Analysis")
+print("1. Greedy Algorithm:")
+print("Sorting Slots: O(n log n)")
+print("Assigning Slots: O(n)")
+print("Total Time Complexity: O(n log n)")
+print("Space Complexity: O(n)")
+
+print("\n2. Brute Force Method:")
+print("Evaluates all possible permutations of slot assignments.")
+print("Total Time Complexity: O(n!)")
+print("Space Complexity: O(n)")
+
+# Result Discussion
+
+print("\nResult Discussion")
+print("The Greedy Algorithm achieved the same optimal distance as the Brute Force method,")
+print("while taking only a fraction of the computation time.")
+print("This confirms that the Greedy approach is both efficient and scalable,")
+print("making it highly suitable for real-world smart parking systems.")
