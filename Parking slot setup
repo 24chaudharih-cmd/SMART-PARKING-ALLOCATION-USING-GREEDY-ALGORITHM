@@ -1,0 +1,26 @@
+import time
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Parking slot initialization and setup
+
+vehicles = ['Car_1', 'Car_2', 'Car_3', 'Car_4']
+slots = [
+    {'id': 'S1', 'distance': 8,  'location': 'North Gate (Near Ticket Counter)'},
+    {'id': 'S2', 'distance': 14, 'location': 'East Wing (Near Food Court)'},
+    {'id': 'S3', 'distance': 5,  'location': 'Main Entry Zone (VIP Area)'},
+    {'id': 'S4', 'distance': 11, 'location': 'South Parking (Bus Stand Side)'}
+]
+
+# Sort slots by nearest distance (Greedy method)
+slots.sort(key=lambda x: x['distance'])
+
+print("Available Parking Slots (Sorted by Distance):")
+for s in slots:
+    print(f"{s['id']} - {s['distance']} meters ({s['location']})")
+
+# Convert to DataFrame for visualization
+slot_df = pd.DataFrame(slots)
+slot_df['vehicle'] = None
